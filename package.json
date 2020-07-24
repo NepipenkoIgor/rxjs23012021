@@ -1,0 +1,62 @@
+{
+  "name": "rx-tasks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:theory": "webpack-dev-server --env.module=0-theory --env.moduleName=Теория",
+    "test:theory": "karma start --module=0-theory ",
+    "start:task-1": "webpack-dev-server --env.module=1-swipe --env.moduleName='Функционал Swipe'",
+    "test:task-1": "karma start --module=1-swipe",
+    "start:task-2": "webpack-dev-server --env.module=2-slider --env.moduleName='Функционал Slider'",
+    "test:task-2": "karma start --module=2-slider",
+    "start:task-3": "webpack-dev-server --env.module=3-skip-limit --env.moduleName='Оператор SkipLimit'",
+    "test:task-3": "karma start --module=3-skip-limit",
+    "start:task-4": "webpack-dev-server --env.module=4-drag-and-drop  --env.moduleName='Функционал Drag&Drop'",
+    "test:task-4": "karma start --module=4-drag-and-drop",
+    "start:task-5": "webpack-dev-server --env.module=5-live-search --env.moduleName='Живой поиск'",
+    "test:task-5": "karma start --module=5-live-search",
+    "start:task-6": "webpack-dev-server --env.module=6-cache-names --env.moduleName='Кэширование запросов'" ,
+    "test:task-6": "karma start --module=6-cache-names",
+    "start:task-7": "webpack-dev-server --env.module=7-animations  --env.moduleName='Aнимация'",
+    "test:task-8": "karma start --module=7-animations"
+  },
+  "keywords": [
+    "learn-rxjs",
+    "rxjs",
+    "typescript",
+    "rxjs-tasks"
+  ],
+  "author": "Nepipenko Ihor",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bootstrap-slider": "^9.9.1",
+    "@types/jasmine": "^3.5.11",
+    "@types/jquery": "^3.5.0",
+    "copy-webpack-plugin": "^6.0.3",
+    "css-loader": "^3.6.0",
+    "html-webpack-plugin": "^4.3.0",
+    "jasmine-core": "^3.6.0",
+    "jasmine-marbles": "^0.6.0",
+    "karma": "^5.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^3.3.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-typescript": "^5.0.3",
+    "sass": "^1.26.10",
+    "sass-loader": "^9.0.2",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.5.0",
+    "bootstrap-slider": "^11.0.2",
+    "jquery": "^3.5.1",
+    "popper.js": "^1.16.1",
+    "rxjs": "^6.6.0"
+  }
+}
