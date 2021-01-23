@@ -1,86 +1,64 @@
-import '../../assets/css/style.css';
-import { interval, Observable, Subscriber } from "rxjs";
+// import '../../assets/css/style.css';
 
-// const sequence = new Promise((res, rej) => {
-//     let count = 1;
-//     setInterval(() => {
-//         res(count++);
-//     }, 1000)
-// })
-//
-// sequence.then((v) => console.log(v));
-// sequence.then((v) => console.log(v));
 
-// const sequence = function* iterationFn() {
-//     let item = 1;
-//     while (true) {
-//         yield item++;
-//     }
-// }();
+// import { interval } from "rxjs";
+// import { filter, map, skip, take, tap } from "rxjs/operators";
 //
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// console.log(sequence.next().value);
-// let count = 1;
-// // interval(1000)
-// const sequence = new Observable((subscriber: Subscriber<number>) => {
-//     const id = setInterval(() => {
-//         if (count % 7 === 0) {
-//             clearInterval(id);
-//             subscriber.complete();
-//             return;
-//         }
-//         subscriber.next(count++);
-//     }, 1000)
-// })
+// const sequence1$ = interval(1000);
 //
+// /*
+// sequence1$  ---0---1---2---3---4---
 //
-// setTimeout(() => {
-//     sequence.subscribe((v) => {
-//         console.log('Sub2 => ', v);
-//     }, () => {
-//     }, () => {
-//         console.log('complete !!!')
-//     })
-// }, 3000)
+//       filter((x)=> x % 2 === 0)
+//             ---0-------2-------4---
+//       tap((x)=>{
+//         console.log(x);
+//         this.loader = true;
+//         return 1;
+//       }),
+//             ---0-------2-------4---
 //
-// sequence.subscribe((v) => {
-//     console.log('Sub1 => ', v);
-// }, () => {
-// }, () => {
-//     console.log('complete !!!')
+//       map((x)=>x**2)
+//             ---0-------4-------16---
+//
+//       skip(2)
+//
+//             -------------------16---
+//
+//       take(1)
+//
+// sequence1$  -------------------16|
+//
+//  */
+//
+// const sequence2$ = sequence1$.pipe(
+//     filter((x)=> x % 2 === 0),
+//     tap((x) => {
+//         console.log('From console', x);
+//         return 1;
+//     }),
+//     map((x) => x ** 2),
+//     skip(2),
+//     take(1)
+// )
+
+// sequence2$.subscribe((v) => {
+//     console.log(v);
 // })
 
-const socket = new WebSocket('wss://echo.websocket.org');
 
-const sequence = new Observable((subscriber) => {
-    socket.addEventListener('message', (e) => {
-        subscriber.next(e);
+import { interval, of, zip } from "rxjs";
+
+const sequence1$ = of('h', 'e', 'l', 'l', 'o');
+const sequence2$ = interval(2000);
+/*
+   sequence1$  (hello)|
+   sequence2$  ---0---1---2---3---4---
+      zip()
+               ---([h,0])---([e,1])---.....([o,4])|
+ */
+
+zip(sequence1$, sequence2$)
+    .subscribe(([l]) => {
+        console.log(l);
     })
-})
-
-
-socket.addEventListener('open', () => {
-    let count = 0;
-    setInterval(() => {
-        socket.send((count++).toString())
-    }, 2000);
-})
-
-sequence.subscribe(({data}: any) => {
-    console.log('sub1 =>', data);
-})
-
-setTimeout(() => {
-    sequence.subscribe(({data}: any) => {
-        console.log('sub2 =>', data);
-    })
-}, 4000)
-
-
