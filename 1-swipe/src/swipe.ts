@@ -1,5 +1,5 @@
-import { fromEvent, merge, Observable, zip } from "rxjs";
-import { filter, map } from "rxjs/operators";
+import { defer, fromEvent, iif, merge, Observable, of, zip } from "rxjs";
+import { filter, map, switchMap } from "rxjs/operators";
 
 type SwipeEvent = MouseEvent | TouchEvent;
 
@@ -18,12 +18,23 @@ const touchEnd$ = getX(
 export function getX(source$: Observable<SwipeEvent>) {
     return source$
         .pipe(
-            map((e: SwipeEvent) => {
-                if (e instanceof TouchEvent) {
-                    return e.changedTouches[0].clientX;
-                }
-                return e.clientX
+            switchMap((event: SwipeEvent) => {
+                return defer(
+                    () => {
+                        if (event instanceof TouchEvent) {
+                            return of((event as TouchEvent).changedTouches[0].clientX);
+
+                        }
+                        return of((event as MouseEvent).clientX);
+                    }
+                )
             })
+            // map((e: SwipeEvent) => {
+            //     if (e instanceof TouchEvent) {
+            //         return e.changedTouches[0].clientX;
+            //     }
+            //     return e.clientX
+            // })
         )
 }
 

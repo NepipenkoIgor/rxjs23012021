@@ -1,100 +1,40 @@
-// import '../../assets/css/style.css';
+import '../../assets/css/style.css';
+import { fromEvent } from "rxjs";
+import { concatMap, exhaustMap, mergeMap, pluck, switchMap } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
 
 
-import { interval, Observable, pipe, Subscriber, TeardownLogic } from "rxjs";
-import { filter, take, takeUntil } from "rxjs/operators";
-
-/*
-function doNothing(source: Observable<any>) {
-    return source;
-}
-
-function toText(source: Observable<any>) {
-    return new Observable((subscriber) => {
-        subscriber.next('Rx JS');
-        subscriber.complete();
-    })
-}
-
-function double(source: Observable<any>) {
-    return new Observable(subscriber => {
-        source.subscribe((value) => {
-            subscriber.next(value * 2)
-        }, (error) => {
-            subscriber.error(error)
-        }, () => {
-            subscriber.complete();
-        })
-    })
-}
-*/
-
-
-// const o$ = new Observable();
-// o$.source = interval(2000);
-// o$.operator = {
-//     call(subscriber: Subscriber<unknown>, source: any): TeardownLogic {
-//         source.subscribe(subscriber)
-//     }
-// }
+// import { interval, of } from "rxjs";
+// import { map, mergeAll, mergeMap } from "rxjs/operators";
 //
-// o$.subscribe((v) => {
+// const sequence$ = interval(1000)
+//     .pipe(
+//         mergeMap((v) => {
+//             return of(v * 2)
+//         }),
+//         // map + mergeAll = mergeMap
+//     )
+//
+// sequence$.subscribe((v) => {
 //     console.log(v);
 // })
 
-class DoubleSubscriber extends Subscriber<number> {
-    next(value: number) {
-        super.next(value * 2);
-    }
-}
+const inputEl = document.querySelector('input') as HTMLInputElement;
 
-// function double(source: Observable<any>) {
-//     const o$ = new Observable();
-//     o$.source = source;
-//     o$.operator = {
-//         call(subscriber: Subscriber<unknown>, source: any): TeardownLogic {
-//             source.subscribe(new DoubleSubscriber(subscriber))
-//         }
-//     }
-//     return o$
-// }
-
-const double = (source$: Observable<number>) =>
-    source$.lift({
-        call(subscriber: Subscriber<number>, source: any): TeardownLogic {
-            source.subscribe(new DoubleSubscriber(subscriber))
-        }
-    })
+const sequence$ = fromEvent(inputEl, 'input')
+    .pipe(
+        pluck('target', 'value'),
+        exhaustMap((value) => {
+            return ajax(`http://learn.javascript.ru/courses/groups/api/participants?key=zniqe9&value=${value}`)
+        }),
+        // map + mergeAll = mergeMap
+        // map + concatAll = concatMap
+        // map + switchAll = switchMap,
+        // map + exhaust = exhaustMap
+        pluck('response')
+    )
 
 
-// interval(1000)
-//     .pipe(take(5), double)
-//     .subscribe((v) => {
-//         console.log(v);
-//     }, () => {
-//     }, () => {
-//         console.log('complete !!!')
-//     })
-
-// const pipe = (...fns: Function[]) => {
-//     return (source: Observable<any>) => {
-//         return fns.reduce((acc, fn) => {
-//             return fn(acc)
-//         }, source)
-//     }
-// }
-
-const doubleWithFilter = pipe(
-    double,
-    filter((v: number) => v % 3 === 0)
-)
-
-
-interval(1000)
-    .pipe(doubleWithFilter)
-    .subscribe((v) => {
-        console.log(v);
-    }, () => {
-    }, () => {
-        console.log('complete !!!')
-    })
+sequence$.subscribe((v) => {
+    console.log(v);
+})
