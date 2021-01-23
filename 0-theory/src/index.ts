@@ -1,64 +1,100 @@
 // import '../../assets/css/style.css';
 
 
-// import { interval } from "rxjs";
-// import { filter, map, skip, take, tap } from "rxjs/operators";
-//
-// const sequence1$ = interval(1000);
-//
-// /*
-// sequence1$  ---0---1---2---3---4---
-//
-//       filter((x)=> x % 2 === 0)
-//             ---0-------2-------4---
-//       tap((x)=>{
-//         console.log(x);
-//         this.loader = true;
-//         return 1;
-//       }),
-//             ---0-------2-------4---
-//
-//       map((x)=>x**2)
-//             ---0-------4-------16---
-//
-//       skip(2)
-//
-//             -------------------16---
-//
-//       take(1)
-//
-// sequence1$  -------------------16|
-//
-//  */
-//
-// const sequence2$ = sequence1$.pipe(
-//     filter((x)=> x % 2 === 0),
-//     tap((x) => {
-//         console.log('From console', x);
-//         return 1;
-//     }),
-//     map((x) => x ** 2),
-//     skip(2),
-//     take(1)
-// )
+import { interval, Observable, pipe, Subscriber, TeardownLogic } from "rxjs";
+import { filter, take, takeUntil } from "rxjs/operators";
 
-// sequence2$.subscribe((v) => {
+/*
+function doNothing(source: Observable<any>) {
+    return source;
+}
+
+function toText(source: Observable<any>) {
+    return new Observable((subscriber) => {
+        subscriber.next('Rx JS');
+        subscriber.complete();
+    })
+}
+
+function double(source: Observable<any>) {
+    return new Observable(subscriber => {
+        source.subscribe((value) => {
+            subscriber.next(value * 2)
+        }, (error) => {
+            subscriber.error(error)
+        }, () => {
+            subscriber.complete();
+        })
+    })
+}
+*/
+
+
+// const o$ = new Observable();
+// o$.source = interval(2000);
+// o$.operator = {
+//     call(subscriber: Subscriber<unknown>, source: any): TeardownLogic {
+//         source.subscribe(subscriber)
+//     }
+// }
+//
+// o$.subscribe((v) => {
 //     console.log(v);
 // })
 
+class DoubleSubscriber extends Subscriber<number> {
+    next(value: number) {
+        super.next(value * 2);
+    }
+}
 
-import { interval, of, zip } from "rxjs";
+// function double(source: Observable<any>) {
+//     const o$ = new Observable();
+//     o$.source = source;
+//     o$.operator = {
+//         call(subscriber: Subscriber<unknown>, source: any): TeardownLogic {
+//             source.subscribe(new DoubleSubscriber(subscriber))
+//         }
+//     }
+//     return o$
+// }
 
-const sequence1$ = of('h', 'e', 'l', 'l', 'o');
-const sequence2$ = interval(2000);
-/*
-   sequence1$  (hello)|
-   sequence2$  ---0---1---2---3---4---
-      zip()
-               ---([h,0])---([e,1])---.....([o,4])|
- */
+const double = (source$: Observable<number>) =>
+    source$.lift({
+        call(subscriber: Subscriber<number>, source: any): TeardownLogic {
+            source.subscribe(new DoubleSubscriber(subscriber))
+        }
+    })
 
-zip(sequence1$, sequence2$)
-    .subscribe(([l]) => {
-        console.log(l);
+
+// interval(1000)
+//     .pipe(take(5), double)
+//     .subscribe((v) => {
+//         console.log(v);
+//     }, () => {
+//     }, () => {
+//         console.log('complete !!!')
+//     })
+
+// const pipe = (...fns: Function[]) => {
+//     return (source: Observable<any>) => {
+//         return fns.reduce((acc, fn) => {
+//             return fn(acc)
+//         }, source)
+//     }
+// }
+
+const doubleWithFilter = pipe(
+    double,
+    filter((v: number) => v % 3 === 0)
+)
+
+
+interval(1000)
+    .pipe(doubleWithFilter)
+    .subscribe((v) => {
+        console.log(v);
+    }, () => {
+    }, () => {
+        console.log('complete !!!')
     })
