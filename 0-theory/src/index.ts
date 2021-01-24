@@ -1,40 +1,96 @@
 import '../../assets/css/style.css';
-import { fromEvent } from "rxjs";
-import { concatMap, exhaustMap, mergeMap, pluck, switchMap } from "rxjs/operators";
+
+// Observable + Observer = Subject
+
+import { AsyncSubject, BehaviorSubject, Observable, ReplaySubject, Subject } from "rxjs";
+import { filter } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
 
-
-// import { interval, of } from "rxjs";
-// import { map, mergeAll, mergeMap } from "rxjs/operators";
+// const sequence$$ = new BehaviorSubject(0);
 //
-// const sequence$ = interval(1000)
-//     .pipe(
-//         mergeMap((v) => {
-//             return of(v * 2)
-//         }),
-//         // map + mergeAll = mergeMap
-//     )
+// sequence$$.next(1);
+// sequence$$.next(2);
+// sequence$$.next(3);
 //
-// sequence$.subscribe((v) => {
-//     console.log(v);
-// })
-
-const inputEl = document.querySelector('input') as HTMLInputElement;
-
-const sequence$ = fromEvent(inputEl, 'input')
-    .pipe(
-        pluck('target', 'value'),
-        exhaustMap((value) => {
-            return ajax(`http://learn.javascript.ru/courses/groups/api/participants?key=zniqe9&value=${value}`)
-        }),
-        // map + mergeAll = mergeMap
-        // map + concatAll = concatMap
-        // map + switchAll = switchMap,
-        // map + exhaust = exhaustMap
-        pluck('response')
-    )
+// setTimeout(() => {
+//     sequence$$.subscribe((v) => {
+//         console.log('SUB1', v);
+//     })
+//     sequence$$.next(4);
+//     sequence$$.next(5);
+// }, 3000)
+//
+// setTimeout(() => {
+//     sequence$$.subscribe((v) => {
+//         console.log('SUB2', v);
+//         console.log('SUB2', sequence$$.value);
+//     })
+// }, 6000)
 
 
-sequence$.subscribe((v) => {
-    console.log(v);
+// const sequence$$ = new ReplaySubject<number>();
+//
+// sequence$$.next(1);
+// sequence$$.next(2);
+// sequence$$.next(3);
+//
+// setTimeout(() => {
+//     sequence$$
+//         .pipe(filter((v: number) => v % 2 === 0))
+//         .subscribe((v) => {
+//             console.log('SUB1', v);
+//         })
+//     sequence$$.next(4);
+//     sequence$$.next(5);
+// }, 3000)
+//
+// setTimeout(() => {
+//     sequence$$.subscribe((v) => {
+//         console.log('SUB2', v);
+//     })
+// }, 6000)
+
+// const sequence$$ = new AsyncSubject();
+//
+// sequence$$.next(1);
+// sequence$$.next(2);
+// sequence$$.next(3);
+//
+// setTimeout(() => {
+//     sequence$$
+//         .subscribe((v) => {
+//             console.log('SUB1', v);
+//         })
+//     sequence$$.next(4);
+//     sequence$$.next(5);
+//     sequence$$.complete();
+// }, 3000)
+//
+// setTimeout(() => {
+//     sequence$$.subscribe((v) => {
+//         console.log('SUB2', v);
+//     })
+// }, 6000)
+
+
+function getUsers(url: string) {
+    let subject: AsyncSubject<any>;
+    return new Observable((subscriber) => {
+        if (!subject) {
+            subject = new AsyncSubject<any>();
+            ajax(url).subscribe(subject)
+        }
+        return subject.subscribe(subscriber)
+    })
+}
+
+const users = getUsers('http://learn.javascript.ru/courses/groups/api/participants?key=zniqe9')
+users.subscribe((users) => {
+    console.log(users);
 })
+
+setTimeout(() => {
+    users.subscribe((users) => {
+        console.log(users);
+    })
+}, 5000)

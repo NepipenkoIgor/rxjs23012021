@@ -1,6 +1,6 @@
-import { Observable } from "rxjs";
+import { EMPTY, Observable } from "rxjs";
 import {
-    bufferCount,
+    bufferCount, catchError,
     concatAll,
     debounceTime,
     distinctUntilChanged,
@@ -48,6 +48,11 @@ export function request(source$: Observable<AjaxResponse>): Observable<any> {
             map((htmlStr: string) => htmlStr.trim().replace(/\s+(<)/g, '<')),
             tap(() => {
                 // hide loader
+            }),
+            catchError((err, obs) => {
+                console.log(err);
+                // hide loader
+                return EMPTY;
             }),
         )
 }

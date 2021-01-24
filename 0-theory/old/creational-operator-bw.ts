@@ -41,7 +41,7 @@ import { map, pluck } from "rxjs/operators";
 // })
 
 
-// const sequence = ajax('http://learn.javascript.ru/courses/groups/api/participants?key=zniqe9');
+// const sequence = ajax(`http://learn.javascript.ru/courses/groups/api/participants?key=zniqe9`);
 // sequence
 //     .pipe(
 //         pluck('response'),
